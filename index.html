@@ -1,1 +1,89 @@
-<h1>Hello World!</h1>
+---
+layout: default
+title: Home
+nav_order: 1
+description: "Srste [Platform] UI Studio"
+permalink: /
+---
+
+<link rel="stylesheet" href="./assets/css/page.css">
+<link rel="stylesheet" href="./assets/css/customstyles.css">
+
+<script type="module" src="./assets/external/zero-md.js"></script>
+
+<div>
+    <div class="w3-sidebar w3-bar-block w3-card w3-animate-left" style="display:none" id="mySidebar">   
+        <button class="w3-bar-item w3-button w3-large" onclick="menuClose()">Close &times;</button>     
+        <div id="sidebar-items">
+
+        </div>
+    </div>
+
+    <div id="main">
+        <div class="w3-teal">
+            <button id="openNav" class="w3-button w3-teal w3-xlarge" onclick="menuOpen()">&#9776;</button>
+            <div class="w3-container">
+                <h1>Srste [Platform] - Documentation</h1>
+            </div>
+        </div>        
+    </div>
+</div>
+
+<script>
+    loadContents();
+    function loadContents() {        
+        var zeroMDElement = document.createElement("zero-md")
+        zeroMDElement.id = "pageContainer";
+        var page = "Home";
+        var queryString = window.location.search?.substr(1) || "";
+        if(queryString) {
+            var queryStringPairs = queryString.split("&");
+            queryStringPairs.forEach((queryStringPair) => {
+                var queryKeyValue = queryStringPair.split("=");
+                if(queryKeyValue[0] == "page") {
+                    page = queryKeyValue[1];
+                    zeroMDElement.setAttribute("src", "./pages/" + page + ".md" || "./pages/Home.md");
+                }
+            });
+        }else {
+            zeroMDElement.setAttribute("src", "./pages/Home.md");
+        }
+
+        document.getElementById("main").appendChild(zeroMDElement);
+        let sidebarEl = document.getElementById("sidebar-items");
+        if(page == "Home") {
+            sidebarEl.innerHTML = `
+                <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>
+                <a href="?page=GettingStarted" id="getting_started" class="w3-bar-item w3-button">Getting Started</a>
+                <a href="?page=BuildingExperiences" class="w3-bar-item w3-button">Building Experiences</a>
+                <a href="?page=CreatingPages" class="w3-bar-item w3-button">Creating Pages</a>`;
+        }else if(page == "BuildingExperiences") {
+            sidebarEl.innerHTML = `
+                <a href="?page=Home" id="getting_started" class="w3-bar-item w3-button">Home</a>                                
+                <a href="?page=CreatingPages" class="w3-bar-item w3-button">Creating Pages</a>`;
+        }
+        
+    }
+
+    function menuOpen() {
+        document.getElementById("main").style.marginLeft = "25%";
+        document.getElementById("mySidebar").style.width = "25%";
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("openNav").style.display = 'none';
+    }
+    function menuClose() {
+        document.getElementById("main").style.marginLeft = "0%";
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("openNav").style.display = "inline-block";
+    }
+    async function copyCode(elm) {      
+        let templateName = elm.getAttribute("name");        
+        elm.parentElement.querySelector(".copyStatus").innerText = "";        
+        let {data} = await import('./media/json/' + templateName + '.js');        
+        await window.navigator.clipboard.writeText(JSON.stringify(data));    
+        await window.navigator.clipboard.readText(); 
+        setTimeout(() => {
+            elm.parentElement.querySelector(".copyStatus").innerText = "Copied!";
+        }, 1000);        
+    }
+</script>
